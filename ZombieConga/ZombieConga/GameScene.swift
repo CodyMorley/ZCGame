@@ -14,6 +14,10 @@ class GameScene: SKScene {
     let background = SKSpriteNode(imageNamed: "background1") ///This is a sprite it uses SKSpriteNode
     let zombie = SKSpriteNode(imageNamed: "zombie1")
     
+    // Update Timer
+    var lastUpdateTime: TimeInterval = 0
+    var dt: TimeInterval = 0
+    
     override func didMove(to view: SKView) {
         backgroundColor = SKColor.black ///spritekit uses colors of type SKColor
         
@@ -33,6 +37,20 @@ class GameScene: SKScene {
     }
     
     override func update(_ currentTime: TimeInterval) {
+        checkUpdateTime(currentTime)
+        
+        /// Game loop
         zombie.position = CGPoint(x: zombie.position.x + 8, y: zombie.position.y)
+    }
+    
+    private func checkUpdateTime(_ currentTime: TimeInterval) {
+        /// Print time since update info
+        if lastUpdateTime > 0 {
+          dt = currentTime - lastUpdateTime
+        } else {
+          dt = 0
+        }
+        lastUpdateTime = currentTime
+        print("\(dt*1000) milliseconds since last update")
     }
 }

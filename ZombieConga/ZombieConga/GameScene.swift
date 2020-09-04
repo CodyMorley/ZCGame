@@ -44,7 +44,9 @@ class GameScene: SKScene {
         
         /// Game loop
         //zombie.position = CGPoint(x: zombie.position.x + 8, y: zombie.position.y)
-        move(sprite: zombie, velocity: CGPoint(x: zombmieMovePointsPerSec, y: 0))
+        //move(sprite: zombie, velocity: CGPoint(x: zombmieMovePointsPerSec, y: 0))
+        move(sprite: zombie,
+             velocity: velocity)
     }
     
     func move(sprite: SKSpriteNode, velocity: CGPoint) {
@@ -64,6 +66,24 @@ class GameScene: SKScene {
                                 y: offset.y / CGFloat(length))
         velocity = CGPoint(x: direction.x * zombmieMovePointsPerSec,
                            y: direction.y * zombmieMovePointsPerSec)
+    }
+    
+    func sceneTouched(touchLocation:CGPoint) {
+        moveZombieToward(location: touchLocation)
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        
+        let touchLocation = touch.location(in: self)
+        sceneTouched(touchLocation: touchLocation)
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        
+        let touchLocation = touch.location(in: self)
+        sceneTouched(touchLocation: touchLocation)
     }
     
     private func checkUpdateTime(_ currentTime: TimeInterval) {

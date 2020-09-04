@@ -10,6 +10,7 @@ import SpriteKit
 import GameplayKit
 
 class GameScene: SKScene {
+    //MARK: - Properties -
     // Sprites
     let background = SKSpriteNode(imageNamed: "background1") ///This is a sprite it uses SKSpriteNode
     let zombie = SKSpriteNode(imageNamed: "zombie1")
@@ -18,9 +19,43 @@ class GameScene: SKScene {
     var lastUpdateTime: TimeInterval = 0
     var dt: TimeInterval = 0
     
+    // Physics and Scene Properties
     let zombmieMovePointsPerSec: CGFloat = 480.0
     var velocity = CGPoint.zero
+    let playableRect: CGRect
     
+    
+    //MARK: - Inits -
+    override init(size: CGSize) {
+        let maxAspectRatio:CGFloat = 2.16
+        let playableHeight = size.width / maxAspectRatio
+        let playableMargin = (size.height-playableHeight)/2.0
+        
+        playableRect = CGRect(x: 0,
+                              y: playableMargin,
+                              width: size.width,
+                              height: playableHeight)
+        super.init(size: size)
+    }
+    
+    required init(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
+    //MARK: - Game State -
+    override func update(_ currentTime: TimeInterval) {
+        checkUpdateTime(currentTime)
+        /// Game loop
+        //zombie.position = CGPoint(x: zombie.position.x + 8, y: zombie.position.y)
+        //move(sprite: zombie, velocity: CGPoint(x: zombmieMovePointsPerSec, y: 0))
+        move(sprite: zombie,
+             velocity: velocity)
+        boundsCheckZombie()
+    }
+
+    
+    //MARK: - Movement -
     override func didMove(to view: SKView) {
         backgroundColor = SKColor.black ///spritekit uses colors of type SKColor
         
@@ -37,17 +72,7 @@ class GameScene: SKScene {
         addChild(zombie)
         //let mySize = background.size
         //print("Size: \(mySize)")
-    }
-    
-    override func update(_ currentTime: TimeInterval) {
-        checkUpdateTime(currentTime)
-        
-        /// Game loop
-        //zombie.position = CGPoint(x: zombie.position.x + 8, y: zombie.position.y)
-        //move(sprite: zombie, velocity: CGPoint(x: zombmieMovePointsPerSec, y: 0))
-        move(sprite: zombie,
-             velocity: velocity)
-        boundsCheckZombie()
+        debugDrawPlayableArea()
     }
     
     func move(sprite: SKSpriteNode, velocity: CGPoint) {
@@ -69,6 +94,8 @@ class GameScene: SKScene {
                            y: direction.y * zombmieMovePointsPerSec)
     }
     
+    
+    //MARK: - Touch -
     func sceneTouched(touchLocation:CGPoint) {
         moveZombieToward(location: touchLocation)
     }
@@ -87,9 +114,19 @@ class GameScene: SKScene {
         sceneTouched(touchLocation: touchLocation)
     }
     
+    
+    //MARK: - Playable Area -
+    /*
+     Might be a good idea to set playable area to device visible area.
+     For this game it would make the ipad version very very easy but keep in mind for future.
+     */
     func boundsCheckZombie() {
-        let bottomLeft = CGPoint.zero
-        let topRight = CGPoint(x: size.width, y: size.height)
+        //let bottomLeft = CGPoint.zero
+        //let topRight = CGPoint(x: size.width, y: size.height)
+        let bottomLeft = CGPoint(x: 0,
+                                 y: playableRect.minY)
+        let topRight = CGPoint(x: size.width,
+                               y: playableRect.maxY)
         
         if zombie.position.x <= bottomLeft.x {
             zombie.position.x = bottomLeft.x
@@ -109,6 +146,15 @@ class GameScene: SKScene {
         }
     }
     
+    func debugDrawPlayableArea() {
+        let shape = SKShapeNode(rect: playableRect)
+        shape.strokeColor = SKColor.red
+        shape.lineWidth = 4.0
+        addChild(shape)
+    }
+    
+    
+    //MARK: - Helper Methods -
     private func checkUpdateTime(_ currentTime: TimeInterval) {
         /// Print time since update info
         if lastUpdateTime > 0 {

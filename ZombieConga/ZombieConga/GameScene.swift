@@ -18,6 +18,9 @@ class GameScene: SKScene {
     var lastUpdateTime: TimeInterval = 0
     var dt: TimeInterval = 0
     
+    let zombmieMovePointsPerSec: CGFloat = 480.0
+    var velocity = CGPoint.zero
+    
     override func didMove(to view: SKView) {
         backgroundColor = SKColor.black ///spritekit uses colors of type SKColor
         
@@ -40,7 +43,17 @@ class GameScene: SKScene {
         checkUpdateTime(currentTime)
         
         /// Game loop
-        zombie.position = CGPoint(x: zombie.position.x + 8, y: zombie.position.y)
+        //zombie.position = CGPoint(x: zombie.position.x + 8, y: zombie.position.y)
+        move(sprite: zombie, velocity: CGPoint(x: zombmieMovePointsPerSec, y: 0))
+    }
+    
+    func move(sprite: SKSpriteNode, velocity: CGPoint) {
+        let amountToMove = CGPoint(x: velocity.x * CGFloat(dt),
+                                   y: velocity.y * CGFloat(dt))
+        print("Amount to move: \(amountToMove)")
+        sprite.position = CGPoint(x: sprite.position.x + amountToMove.x,
+                                  y: sprite.position.y + amountToMove.y)
+        
     }
     
     private func checkUpdateTime(_ currentTime: TimeInterval) {

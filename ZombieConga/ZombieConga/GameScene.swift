@@ -56,6 +56,16 @@ class GameScene: SKScene {
         
     }
     
+    func moveZombieToward(location: CGPoint) {
+        let offset = CGPoint(x: location.x - zombie.position.x,
+                             y: location.y - zombie.position.y)
+        let length = sqrt(Double(offset.x * offset.x + offset.y * offset.y))
+        let direction = CGPoint(x: offset.x / CGFloat(length),
+                                y: offset.y / CGFloat(length))
+        velocity = CGPoint(x: direction.x * zombmieMovePointsPerSec,
+                           y: direction.y * zombmieMovePointsPerSec)
+    }
+    
     private func checkUpdateTime(_ currentTime: TimeInterval) {
         /// Print time since update info
         if lastUpdateTime > 0 {

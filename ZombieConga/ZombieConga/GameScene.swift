@@ -22,14 +22,16 @@ class GameScene: SKScene {
     // Physics and Scene Properties
     let zombmieMovePointsPerSec: CGFloat = 480.0
     var velocity = CGPoint.zero
+    let zombieRotationRadiansPerSec: CGFloat = 4.0 * π
     let playableRect: CGRect
+    var lastTouchLocation: CGPoint?
     
     
     //MARK: - Inits -
     override init(size: CGSize) {
         let maxAspectRatio:CGFloat = 2.16
         let playableHeight = size.width / maxAspectRatio
-        let playableMargin = (size.height-playableHeight)/2.0
+        let playableMargin = (size.height - playableHeight)/2.0
         
         playableRect = CGRect(x: 0,
                               y: playableMargin,
@@ -49,13 +51,22 @@ class GameScene: SKScene {
         /// Game loop
         //zombie.position = CGPoint(x: zombie.position.x + 8, y: zombie.position.y)
         //move(sprite: zombie, velocity: CGPoint(x: zombmieMovePointsPerSec, y: 0))
-        move(sprite: zombie,
-             velocity: velocity)
+        if let lastTouch = lastTouchLocation {
+            let touchLocationDiff = lastTouch - zombie.position
+            if touchLocationDiff.length() <= zombmieMovePointsPerSec * CGFloat(dt) {
+                zombie.position = lastTouch
+                velocity = CGPoint.zero
+            } else {
+                move(sprite: zombie,
+                     velocity: velocity)
+                rotate(sprite: zombie,
+                       direction: velocity,
+                       rotateRadiansPerSec: zombieRotationRadiansPerSec)
+            }
+        }
         boundsCheckZombie()
-        rotate(sprite: zombie,
-               direction: velocity)
     }
-
+    
     
     //MARK: - Movement -
     override func didMove(to view: SKView) {
@@ -78,31 +89,28 @@ class GameScene: SKScene {
     }
     
     func move(sprite: SKSpriteNode, velocity: CGPoint) {
-        let amountToMove = CGPoint(x: velocity.x * CGFloat(dt),
-                                   y: velocity.y * CGFloat(dt))
+        let amountToMove = velocity * CGFloat(dt)
         print("Amount to move: \(amountToMove)")
-        sprite.position = CGPoint(x: sprite.position.x + amountToMove.x,
-                                  y: sprite.position.y + amountToMove.y)
-        
+        sprite.position += amountToMove
     }
     
     func moveZombieToward(location: CGPoint) {
-        let offset = CGPoint(x: location.x - zombie.position.x,
-                             y: location.y - zombie.position.y)
-        let length = sqrt(Double(offset.x * offset.x + offset.y * offset.y))
-        let direction = CGPoint(x: offset.x / CGFloat(length),
-                                y: offset.y / CGFloat(length))
-        velocity = CGPoint(x: direction.x * zombmieMovePointsPerSec,
-                           y: direction.y * zombmieMovePointsPerSec)
+        let offset = location - zombie.position
+        let direction = offset.normalized()
+        velocity = direction * zombmieMovePointsPerSec
     }
     
-    func rotate(sprite: SKSpriteNode, direction: CGPoint) {
-        sprite.zRotation = atan2(direction.y, direction.x)
+    func rotate(sprite: SKSpriteNode, direction: CGPoint, rotateRadiansPerSec: CGFloat) {
+        let shortest = shortestAngleBetween(angle1: sprite.zRotation,
+                                            angle2: velocity.angle)
+        let amountToRotate = min(rotateRadiansPerSec * CGFloat(dt), abs(shortest))
+        sprite.zRotation += shortest.sign() * amountToRotate
     }
     
     
     //MARK: - Touch -
     func sceneTouched(touchLocation:CGPoint) {
+        lastTouchLocation = touchLocation
         moveZombieToward(location: touchLocation)
     }
     
@@ -164,9 +172,9 @@ class GameScene: SKScene {
     private func checkUpdateTime(_ currentTime: TimeInterval) {
         /// Print time since update info
         if lastUpdateTime > 0 {
-          dt = currentTime - lastUpdateTime
+            dt = currentTime - lastUpdateTime
         } else {
-          dt = 0
+            dt = 0
         }
         lastUpdateTime = currentTime
         print("\(dt*1000) milliseconds since last update")

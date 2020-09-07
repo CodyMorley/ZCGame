@@ -83,7 +83,12 @@ class GameScene: SKScene {
         
         addChild(background) /// This adds the sprite (SKNode) as a child of the scene (SKScene)
         addChild(zombie)
-        spawnEnemy()
+        run(SKAction.repeatForever(
+            SKAction.sequence([SKAction.run() { [weak self] in
+            self?.spawnEnemy()
+                },
+                SKAction.wait(forDuration: 2.0)]))) // Normally SpriteKit cleans up the memory for its' own nodes but in closures we must use weak references.
+        
         //let mySize = background.size
         //print("Size: \(mySize)")
         debugDrawPlayableArea()
@@ -173,8 +178,13 @@ class GameScene: SKScene {
     func spawnEnemy() {
         let enemy = SKSpriteNode(imageNamed: "enemy")
         enemy.position = CGPoint(x: size.width + enemy.size.width / 2,
-                                 y: size.height / 2)
+                                 y: CGFloat.random(min: playableRect.minY + enemy.size.height / 2,
+                                                   max: playableRect.maxY - enemy.size.height / 2))
         addChild(enemy)
+        let actionMove = SKAction.moveTo(x: -enemy.size.width / 2,
+                                         duration: 2)
+        let actionRemove = SKAction.removeFromParent()
+        /*
         let actionMidMove = SKAction.moveBy(
             x: -size.width / 2 - enemy.size.width / 2,
             y: -playableRect.height / 2 + enemy.size.height / 2,
@@ -202,7 +212,9 @@ class GameScene: SKScene {
                                           logMessage, wait,
                                           reverseMid])*/
         let repeatAction = SKAction.repeatForever(sequence)
-        enemy.run(repeatAction)
+        */
+        enemy.run(SKAction.sequence([actionMove,
+                                     actionRemove]))
     }
     
     //MARK: - Helper Methods -

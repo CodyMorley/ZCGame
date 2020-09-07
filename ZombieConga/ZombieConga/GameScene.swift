@@ -91,7 +91,7 @@ class GameScene: SKScene {
     
     func move(sprite: SKSpriteNode, velocity: CGPoint) {
         let amountToMove = velocity * CGFloat(dt)
-        print("Amount to move: \(amountToMove)")
+        //print("Amount to move: \(amountToMove)")
         sprite.position += amountToMove
     }
     
@@ -201,7 +201,8 @@ class GameScene: SKScene {
                                           reverseMove,
                                           logMessage, wait,
                                           reverseMid])*/
-        enemy.run(sequence)
+        let repeatAction = SKAction.repeatForever(sequence)
+        enemy.run(repeatAction)
     }
     
     //MARK: - Helper Methods -

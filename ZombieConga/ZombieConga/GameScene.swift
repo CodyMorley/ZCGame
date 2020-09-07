@@ -175,14 +175,32 @@ class GameScene: SKScene {
         enemy.position = CGPoint(x: size.width + enemy.size.width / 2,
                                  y: size.height / 2)
         addChild(enemy)
-        let actionMove = SKAction.move(to: CGPoint(x: -enemy.size.width / 2,
-                                                   y: enemy.position.y),
-                                       duration: 1.0)
-        let actionMidMove = SKAction.move(to: CGPoint(x: size.width / 2,
-                                                      y: playableRect.minY + enemy.size.height / 2),
-                                          duration: 1.0)
+        let actionMidMove = SKAction.moveBy(
+            x: -size.width / 2 - enemy.size.width / 2,
+            y: -playableRect.height / 2 + enemy.size.height / 2,
+            duration: 1.0)
+        //let reverseMid = actionMidMove.reversed()
+        let actionMove = SKAction.moveBy(
+            x: -size.width / 2 - enemy.size.width / 2,
+            y: playableRect.height / 2 - enemy.size.height / 2,
+            duration: 1.0)
+        //let reverseMove = actionMove.reversed()
         let wait = SKAction.wait(forDuration: 0.25)
-        let sequence = SKAction.sequence([actionMidMove, wait, actionMove])
+        let logMessage = SKAction.run() {
+            print("Reached Bottom.")
+        }
+        let halfSequence = SKAction.sequence([actionMidMove,
+                                              logMessage,
+                                              wait,
+                                              actionMove])
+        let sequence = SKAction.sequence([halfSequence,
+                                         halfSequence.reversed()])
+        /*let sequence = SKAction.sequence([actionMidMove,
+                                          logMessage, wait,
+                                          actionMove,
+                                          reverseMove,
+                                          logMessage, wait,
+                                          reverseMid])*/
         enemy.run(sequence)
     }
     
@@ -195,6 +213,6 @@ class GameScene: SKScene {
             dt = 0
         }
         lastUpdateTime = currentTime
-        print("\(dt*1000) milliseconds since last update")
+        //print("\(dt*1000) milliseconds since last update")
     }
 }

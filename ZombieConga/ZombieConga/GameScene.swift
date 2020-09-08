@@ -29,7 +29,8 @@ class GameScene: SKScene {
     
     //SKActions
     let zombieAnimation: SKAction
-    
+    let catCollisionSound = SKAction.playSoundFileNamed("hitCat.wav", waitForCompletion: false)
+    let enemyCollisionSound = SKAction.playSoundFileNamed("hitCatLady.wav", waitForCompletion: false)
     
     //MARK: - Inits -
     override init(size: CGSize) {
@@ -215,10 +216,12 @@ class GameScene: SKScene {
     //MARK: - Collision Detection -
     func zombieHit(cat: SKSpriteNode) {
         cat.removeFromParent()
+        run(catCollisionSound)
     }
     
     func zombieHit(enemy: SKSpriteNode) {
         enemy.removeFromParent()
+        run(enemyCollisionSound)
     }
     
     func checkCollisions() {

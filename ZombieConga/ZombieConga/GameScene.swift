@@ -90,6 +90,8 @@ class GameScene: SKScene {
         if lives <= 0 && !gameOver {
             gameOver = true
             print("You Lose")
+            backgroundMusicPlayer.stop()
+            endGame(false)
         }
     }
     
@@ -128,7 +130,8 @@ class GameScene: SKScene {
                 SKAction.wait(forDuration: 1.0)])))
         //let mySize = background.size
         //print("Size: \(mySize)")
-        debugDrawPlayableArea()
+        //debugDrawPlayableArea()
+        playBackgroundMusic(filename: "backgroundMusic.mp3")
     }
     
     func move(sprite: SKSpriteNode, velocity: CGPoint) {
@@ -174,6 +177,8 @@ class GameScene: SKScene {
         if trainCount >= 15 && !gameOver {
             gameOver = true
             print("YOU WIN!")
+            backgroundMusicPlayer.stop()
+            endGame(true)
         }
     }
     
@@ -423,5 +428,12 @@ class GameScene: SKScene {
         }
         lastUpdateTime = currentTime
         //print("\(dt*1000) milliseconds since last update")
+    }
+    
+    private func endGame(_ didWin: Bool) {
+        let gameOverScene = GameOverScene(size: size, didWin: didWin)
+        gameOverScene.scaleMode = scaleMode
+        let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
+        view?.presentScene(gameOverScene, transition: reveal)
     }
 }

@@ -11,28 +11,30 @@ import GameplayKit
 
 class GameScene: SKScene {
     //MARK: - Properties -
-    // Sprites
+    // Sprites & Gameplay Properties
     let background = SKSpriteNode(imageNamed: "background1") ///This is a sprite it uses SKSpriteNode
     let zombie = SKSpriteNode(imageNamed: "zombie1")
+    var zombieInvincible: Bool = false
+    var lives = 5
+    var gameOver = false
     
     // Update Timer
     var lastUpdateTime: TimeInterval = 0
     var dt: TimeInterval = 0
     
     // Physics and Scene Properties
-    let zombmieMovePointsPerSec: CGFloat = 480.0
-    let trainMovePointsPerSec: CGFloat = 480.0
-    var velocity = CGPoint.zero
-    let zombieRotationRadiansPerSec: CGFloat = 4.0 * π
     let playableRect: CGRect
     var lastTouchLocation: CGPoint?
-    var zombieInvincible: Bool = false
-    
+    var velocity = CGPoint.zero
+    let zombmieMovePointsPerSec: CGFloat = 480.0
+    let trainMovePointsPerSec: CGFloat = 480.0
+    let zombieRotationRadiansPerSec: CGFloat = 4.0 * π
     
     //SKActions
     let zombieAnimation: SKAction
     let catCollisionSound = SKAction.playSoundFileNamed("hitCat.wav", waitForCompletion: false)
     let enemyCollisionSound = SKAction.playSoundFileNamed("hitCatLady.wav", waitForCompletion: false)
+    
     
     //MARK: - Inits -
     override init(size: CGSize) {
@@ -84,6 +86,11 @@ class GameScene: SKScene {
         boundsCheckZombie()
         //checkCollisions()
         moveTrain()
+        
+        if lives <= 0 && !gameOver {
+            gameOver = true
+            print("You Lose")
+        }
     }
     
     override func didEvaluateActions() {
@@ -146,8 +153,10 @@ class GameScene: SKScene {
     
     func moveTrain() {
         var targetPosition = zombie.position
+        var trainCount = 0
         
         enumerateChildNodes(withName: "train") { node, stop in
+            trainCount += 1
             if !node.hasActions() {
                 let actionDuration = 0.3
                 let offset = targetPosition - node.position
@@ -160,6 +169,33 @@ class GameScene: SKScene {
                 node.run(moveAction)
             }
             targetPosition = node.position
+        }
+        
+        if trainCount >= 15 && !gameOver {
+            gameOver = true
+            print("YOU WIN!")
+        }
+    }
+    
+    func loseCats() {
+        var loseCount = 0
+        enumerateChildNodes(withName: "train") { (node, stop) in
+            var randomPosition = node.position
+            randomPosition.x += CGFloat.random(min: 100, max: 100)
+            randomPosition.y += CGFloat.random(min: 100, max: 100)
+            
+            node.name = ""
+            node.run(SKAction.sequence(
+                        [SKAction.group(
+                            [SKAction.rotate(byAngle: π * 4, duration: 1.0),
+                             SKAction.move(to: randomPosition, duration: 1.0),
+                             SKAction.scale(to: 0, duration: 1.0)]),
+                         SKAction.removeFromParent()]))
+            
+            loseCount += 1
+            if loseCount >= 2 {
+                stop[0] = true
+            }
         }
     }
     
@@ -265,6 +301,8 @@ class GameScene: SKScene {
         }
         zombie.run(SKAction.sequence([blinkAction, setHidden]))
         run(enemyCollisionSound)
+        loseCats()
+        lives -= 1
     }
     
     func checkCollisions() {

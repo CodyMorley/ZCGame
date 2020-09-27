@@ -84,12 +84,9 @@
 		5E1F48E524FF42B6009A42FF /* ZombieConga */ = {
 			isa = PBXGroup;
 			children = (
-				5E1F490025033978009A42FF /* MyUtils.swift */,
-				5E1F48EC24FF42B6009A42FF /* GameScene.swift */,
-				5EAA0FFE252084CF00B57749 /* GameOverScene.swift */,
-				5EAA100125208BFE00B57749 /* MainMenuScene.swift */,
-				5E1F48EE24FF42B6009A42FF /* GameViewController.swift */,
-				5E1F48FE24FF4324009A42FF /* Storyboards */,
+				5EAA1007252090C500B57749 /* Views */,
+				5EAA1006252090B200B57749 /* View Controllers */,
+				5EAA1009252090DB00B57749 /* Utilities */,
 				5E1F48FF24FF4333009A42FF /* Resources */,
 			);
 			path = ZombieConga;
@@ -113,6 +110,41 @@
 				5E1F48E624FF42B6009A42FF /* AppDelegate.swift */,
 			);
 			name = Resources;
+			sourceTree = "<group>";
+		};
+		5EAA1005252090A400B57749 /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				5E1F48EC24FF42B6009A42FF /* GameScene.swift */,
+				5EAA0FFE252084CF00B57749 /* GameOverScene.swift */,
+				5EAA100125208BFE00B57749 /* MainMenuScene.swift */,
+			);
+			path = Scenes;
+			sourceTree = "<group>";
+		};
+		5EAA1006252090B200B57749 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				5E1F48EE24FF42B6009A42FF /* GameViewController.swift */,
+			);
+			path = "View Controllers";
+			sourceTree = "<group>";
+		};
+		5EAA1007252090C500B57749 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				5EAA1005252090A400B57749 /* Scenes */,
+				5E1F48FE24FF4324009A42FF /* Storyboards */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		5EAA1009252090DB00B57749 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				5E1F490025033978009A42FF /* MyUtils.swift */,
+			);
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

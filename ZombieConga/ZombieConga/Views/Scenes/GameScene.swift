@@ -11,18 +11,18 @@ import GameplayKit
 
 class GameScene: SKScene {
     //MARK: - Properties -
-    // Sprites & Gameplay Properties
-    let background = SKSpriteNode(imageNamed: "background1") ///This is a sprite it uses SKSpriteNode
+    /// Sprites & Gameplay Properties
+    let background = SKSpriteNode(imageNamed: "background1")
     let zombie = SKSpriteNode(imageNamed: "zombie1")
     var zombieInvincible: Bool = false
     var lives = 5
     var gameOver = false
     
-    // Update Timer
+    /// Update Timer
     var lastUpdateTime: TimeInterval = 0
     var dt: TimeInterval = 0
     
-    // Physics and Scene Properties
+    /// Physics and Scene Properties
     let playableRect: CGRect
     var lastTouchLocation: CGPoint?
     var velocity = CGPoint.zero
@@ -30,7 +30,7 @@ class GameScene: SKScene {
     let trainMovePointsPerSec: CGFloat = 480.0
     let zombieRotationRadiansPerSec: CGFloat = 4.0 * π
     
-    //SKActions
+    ///SKActions
     let zombieAnimation: SKAction
     let catCollisionSound = SKAction.playSoundFileNamed("hitCat.wav", waitForCompletion: false)
     let enemyCollisionSound = SKAction.playSoundFileNamed("hitCatLady.wav", waitForCompletion: false)
@@ -67,8 +67,6 @@ class GameScene: SKScene {
     override func update(_ currentTime: TimeInterval) {
         checkUpdateTime(currentTime)
         /// Game loop
-        //zombie.position = CGPoint(x: zombie.position.x + 8, y: zombie.position.y)
-        //move(sprite: zombie, velocity: CGPoint(x: zombmieMovePointsPerSec, y: 0))
         if let lastTouch = lastTouchLocation {
             let touchLocationDiff = lastTouch - zombie.position
             if touchLocationDiff.length() <= zombmieMovePointsPerSec * CGFloat(dt) {
@@ -84,7 +82,6 @@ class GameScene: SKScene {
             }
         }
         boundsCheckZombie()
-        //checkCollisions()
         moveTrain()
         
         if lives <= 0 && !gameOver {
@@ -102,41 +99,35 @@ class GameScene: SKScene {
     
     //MARK: - Movement -
     override func didMove(to view: SKView) {
-        backgroundColor = SKColor.black ///spritekit uses colors of type SKColor
+        backgroundColor = SKColor.black
         
         background.anchorPoint = CGPoint(x: 0.5, y: 0.5) /// default
         background.position = CGPoint(x: size.width/2, y: size.height/2)
         background.zPosition = -1
-        //background.zRotation = CGFloat.pi / 8
         
         zombie.position = CGPoint(x: 400, y: 400)
         zombie.zPosition = 100
-        //zombie.scale(to: CGSize(width: zombie.size.width * 2, height: zombie.size.height * 2)) ///Method of SKSpriteNode
-        //zombie.setScale(2) ///Method of SKNode
         
-        addChild(background) /// This adds the sprite (SKNode) as a child of the scene (SKScene)
+        addChild(background)
         addChild(zombie)
-        //zombie.run(SKAction.repeatForever(zombieAnimation))
         
         run(SKAction.repeatForever(
                 SKAction.sequence([SKAction.run() { [weak self] in
                     self?.spawnEnemy()
                 },
-                SKAction.wait(forDuration: 2.0)]))) // Normally SpriteKit cleans up the memory for its' own nodes but in closures we must use weak references.
+                SKAction.wait(forDuration: 2.0)])))
+        
         run(SKAction.repeatForever(
                 SKAction.sequence([SKAction.run() { [weak self] in
                     self?.spawnCat()
                 },
                 SKAction.wait(forDuration: 1.0)])))
-        //let mySize = background.size
-        //print("Size: \(mySize)")
         //debugDrawPlayableArea()
         playBackgroundMusic(filename: "backgroundMusic.mp3")
     }
     
     func move(sprite: SKSpriteNode, velocity: CGPoint) {
         let amountToMove = velocity * CGFloat(dt)
-        //print("Amount to move: \(amountToMove)")
         sprite.position += amountToMove
     }
     
@@ -239,13 +230,7 @@ class GameScene: SKScene {
     
     
     //MARK: - Playable Area -
-    /*
-     Might be a good idea to set playable area to device visible area.
-     For this game it would make the ipad version very very easy but keep in mind for future.
-     */
     func boundsCheckZombie() {
-        //let bottomLeft = CGPoint.zero
-        //let topRight = CGPoint(x: size.width, y: size.height)
         let bottomLeft = CGPoint(x: 0,
                                  y: playableRect.minY)
         let topRight = CGPoint(x: size.width,
@@ -354,35 +339,6 @@ class GameScene: SKScene {
         let actionMove = SKAction.moveTo(x: -enemy.size.width / 2,
                                          duration: 2)
         let actionRemove = SKAction.removeFromParent()
-        /*
-         let actionMidMove = SKAction.moveBy(
-         x: -size.width / 2 - enemy.size.width / 2,
-         y: -playableRect.height / 2 + enemy.size.height / 2,
-         duration: 1.0)
-         //let reverseMid = actionMidMove.reversed()
-         let actionMove = SKAction.moveBy(
-         x: -size.width / 2 - enemy.size.width / 2,
-         y: playableRect.height / 2 - enemy.size.height / 2,
-         duration: 1.0)
-         //let reverseMove = actionMove.reversed()
-         let wait = SKAction.wait(forDuration: 0.25)
-         let logMessage = SKAction.run() {
-         print("Reached Bottom.")
-         }
-         let halfSequence = SKAction.sequence([actionMidMove,
-         logMessage,
-         wait,
-         actionMove])
-         let sequence = SKAction.sequence([halfSequence,
-         halfSequence.reversed()])
-         /*let sequence = SKAction.sequence([actionMidMove,
-         logMessage, wait,
-         actionMove,
-         reverseMove,
-         logMessage, wait,
-         reverseMid])*/
-         let repeatAction = SKAction.repeatForever(sequence)
-         */
         enemy.run(SKAction.sequence([actionMove,
                                      actionRemove]))
     }
@@ -420,14 +376,13 @@ class GameScene: SKScene {
     
     //MARK: - Helper Methods -
     private func checkUpdateTime(_ currentTime: TimeInterval) {
-        /// Print time since update info
+        
         if lastUpdateTime > 0 {
             dt = currentTime - lastUpdateTime
         } else {
             dt = 0
         }
         lastUpdateTime = currentTime
-        //print("\(dt*1000) milliseconds since last update")
     }
     
     private func endGame(_ didWin: Bool) {

@@ -21,10 +21,12 @@ class GameScene: SKScene {
     
     // Physics and Scene Properties
     let zombmieMovePointsPerSec: CGFloat = 480.0
+    let trainMovePointsPerSec: CGFloat = 480.0
     var velocity = CGPoint.zero
     let zombieRotationRadiansPerSec: CGFloat = 4.0 * π
     let playableRect: CGRect
     var lastTouchLocation: CGPoint?
+    var zombieInvincible: Bool = false
     
     
     //SKActions
@@ -81,6 +83,7 @@ class GameScene: SKScene {
         }
         boundsCheckZombie()
         //checkCollisions()
+        moveTrain()
     }
     
     override func didEvaluateActions() {
@@ -98,6 +101,7 @@ class GameScene: SKScene {
         //background.zRotation = CGFloat.pi / 8
         
         zombie.position = CGPoint(x: 400, y: 400)
+        zombie.zPosition = 100
         //zombie.scale(to: CGSize(width: zombie.size.width * 2, height: zombie.size.height * 2)) ///Method of SKSpriteNode
         //zombie.setScale(2) ///Method of SKNode
         
@@ -106,15 +110,15 @@ class GameScene: SKScene {
         //zombie.run(SKAction.repeatForever(zombieAnimation))
         
         run(SKAction.repeatForever(
-            SKAction.sequence([SKAction.run() { [weak self] in
-            self?.spawnEnemy()
+                SKAction.sequence([SKAction.run() { [weak self] in
+                    self?.spawnEnemy()
                 },
                 SKAction.wait(forDuration: 2.0)]))) // Normally SpriteKit cleans up the memory for its' own nodes but in closures we must use weak references.
         run(SKAction.repeatForever(
-            SKAction.sequence([SKAction.run() { [weak self] in
-                self?.spawnCat()
+                SKAction.sequence([SKAction.run() { [weak self] in
+                    self?.spawnCat()
                 },
-                               SKAction.wait(forDuration: 1.0)])))
+                SKAction.wait(forDuration: 1.0)])))
         //let mySize = background.size
         //print("Size: \(mySize)")
         debugDrawPlayableArea()
@@ -138,6 +142,25 @@ class GameScene: SKScene {
                                             angle2: velocity.angle)
         let amountToRotate = min(rotateRadiansPerSec * CGFloat(dt), abs(shortest))
         sprite.zRotation += shortest.sign() * amountToRotate
+    }
+    
+    func moveTrain() {
+        var targetPosition = zombie.position
+        
+        enumerateChildNodes(withName: "train") { node, stop in
+            if !node.hasActions() {
+                let actionDuration = 0.3
+                let offset = targetPosition - node.position
+                let direction = offset.normalized()
+                let distancePerSec = direction * self.trainMovePointsPerSec
+                let distanceToMove = distancePerSec * CGFloat(actionDuration)
+                let moveAction = SKAction.moveBy(x: distanceToMove.x,
+                                                 y: distanceToMove.y,
+                                                 duration: actionDuration)
+                node.run(moveAction)
+            }
+            targetPosition = node.position
+        }
     }
     
     
@@ -215,18 +238,42 @@ class GameScene: SKScene {
     
     //MARK: - Collision Detection -
     func zombieHit(cat: SKSpriteNode) {
-        cat.removeFromParent()
+        cat.name = "train"
+        cat.removeAllActions()
+        cat.setScale(1.0)
+        cat.zRotation = 0
+        
+        let greenify = SKAction.colorize(with: SKColor.green,
+                                         colorBlendFactor: 1.0,
+                                         duration: 0.2)
+        cat.run(greenify)
         run(catCollisionSound)
     }
     
     func zombieHit(enemy: SKSpriteNode) {
-        enemy.removeFromParent()
+        zombieInvincible = true
+        let blinks = 10.0
+        let duration = 3.0
+        let blinkAction = SKAction.customAction(withDuration: duration) { node, elapsedTime in
+            let slice = duration / blinks
+            let remainder = Double(elapsedTime).truncatingRemainder(dividingBy: slice)
+            node.isHidden = remainder > slice / 2
+        }
+        let setHidden = SKAction.run() { [weak self] in
+            self?.zombie.isHidden = false
+            self?.zombieInvincible = false
+        }
+        zombie.run(SKAction.sequence([blinkAction, setHidden]))
         run(enemyCollisionSound)
     }
     
     func checkCollisions() {
         var hitCats: [SKSpriteNode] = []
         var hitEnemies: [SKSpriteNode] = []
+        
+        if zombieInvincible {
+            return
+        }
         
         enumerateChildNodes(withName: "cat") { node, _ in
             let cat = node as! SKSpriteNode
@@ -265,34 +312,34 @@ class GameScene: SKScene {
                                          duration: 2)
         let actionRemove = SKAction.removeFromParent()
         /*
-        let actionMidMove = SKAction.moveBy(
-            x: -size.width / 2 - enemy.size.width / 2,
-            y: -playableRect.height / 2 + enemy.size.height / 2,
-            duration: 1.0)
-        //let reverseMid = actionMidMove.reversed()
-        let actionMove = SKAction.moveBy(
-            x: -size.width / 2 - enemy.size.width / 2,
-            y: playableRect.height / 2 - enemy.size.height / 2,
-            duration: 1.0)
-        //let reverseMove = actionMove.reversed()
-        let wait = SKAction.wait(forDuration: 0.25)
-        let logMessage = SKAction.run() {
-            print("Reached Bottom.")
-        }
-        let halfSequence = SKAction.sequence([actionMidMove,
-                                              logMessage,
-                                              wait,
-                                              actionMove])
-        let sequence = SKAction.sequence([halfSequence,
-                                         halfSequence.reversed()])
-        /*let sequence = SKAction.sequence([actionMidMove,
-                                          logMessage, wait,
-                                          actionMove,
-                                          reverseMove,
-                                          logMessage, wait,
-                                          reverseMid])*/
-        let repeatAction = SKAction.repeatForever(sequence)
-        */
+         let actionMidMove = SKAction.moveBy(
+         x: -size.width / 2 - enemy.size.width / 2,
+         y: -playableRect.height / 2 + enemy.size.height / 2,
+         duration: 1.0)
+         //let reverseMid = actionMidMove.reversed()
+         let actionMove = SKAction.moveBy(
+         x: -size.width / 2 - enemy.size.width / 2,
+         y: playableRect.height / 2 - enemy.size.height / 2,
+         duration: 1.0)
+         //let reverseMove = actionMove.reversed()
+         let wait = SKAction.wait(forDuration: 0.25)
+         let logMessage = SKAction.run() {
+         print("Reached Bottom.")
+         }
+         let halfSequence = SKAction.sequence([actionMidMove,
+         logMessage,
+         wait,
+         actionMove])
+         let sequence = SKAction.sequence([halfSequence,
+         halfSequence.reversed()])
+         /*let sequence = SKAction.sequence([actionMidMove,
+         logMessage, wait,
+         actionMove,
+         reverseMove,
+         logMessage, wait,
+         reverseMid])*/
+         let repeatAction = SKAction.repeatForever(sequence)
+         */
         enemy.run(SKAction.sequence([actionMove,
                                      actionRemove]))
     }

@@ -51,9 +51,9 @@ class GameScene: SKScene {
     
     //MARK: - Inits -
     override init(size: CGSize) {
-        let maxAspectRatio:CGFloat = 2.16
+        let maxAspectRatio:CGFloat = 16.0 / 9.0
         let playableHeight = size.width / maxAspectRatio
-        let playableMargin = (size.height - playableHeight)/2.0
+        let playableMargin = (size.height - playableHeight) / 2.0
         
         playableRect = CGRect(x: 0,
                               y: playableMargin,
@@ -80,22 +80,6 @@ class GameScene: SKScene {
     override func update(_ currentTime: TimeInterval) {
         checkUpdateTime(currentTime)
         /// Game loop
-        /*
-        if let lastTouch = lastTouchLocation {
-            let touchLocationDiff = lastTouch - zombie.position
-            if touchLocationDiff.length() <= zombmieMovePointsPerSec * CGFloat(dt) {
-                zombie.position = lastTouch
-                velocity = CGPoint.zero
-                stopZombieAnimation()
-            } else {
-                move(sprite: zombie,
-                     velocity: velocity)
-                rotate(sprite: zombie,
-                       direction: velocity,
-                       rotateRadiansPerSec: zombieRotationRadiansPerSec)
-            }
-        }
-        */
         move(sprite: zombie,
              velocity: velocity)
         rotate(sprite: zombie,
@@ -113,8 +97,6 @@ class GameScene: SKScene {
             backgroundMusicPlayer.stop()
             endGame(false)
         }
-        
-        //cameraNode.position = zombie.position
     }
     
     override func didEvaluateActions() {
@@ -124,13 +106,10 @@ class GameScene: SKScene {
     
     //MARK: - Movement -
     override func didMove(to view: SKView) {
+        //debugDrawPlayableArea()
         backgroundColor = SKColor.black
+        playBackgroundMusic(filename: "backgroundMusic.mp3")
         
-//        let background = backgroundNode()
-//        background.anchorPoint = CGPoint.zero
-//        background.position = CGPoint.zero
-//        background.name = "background"
-//        background.zPosition = -1
         for i in 0...1 {
             let background = backgroundNode()
             background.anchorPoint = CGPoint.zero
@@ -156,17 +135,17 @@ class GameScene: SKScene {
         catsLabel.zPosition = 150
         catsLabel.horizontalAlignmentMode = .right
         catsLabel.verticalAlignmentMode = .bottom
-        catsLabel.position = CGPoint(x: -playableRect.size.width / 2 + CGFloat(20),
+        catsLabel.position = CGPoint(x: playableRect.size.width / 2 - CGFloat(20),
                                      y: -playableRect.size.height / 2 + CGFloat(20))
         
         zombie.position = CGPoint(x: 400, y: 400)
         zombie.zPosition = 100
-        
-        camera = cameraNode
-        cameraNode.position = CGPoint(x: size.width / 2, y: size.height / 2)
-        
         addChild(zombie)
+        
         addChild(cameraNode)
+        camera = cameraNode
+        cameraNode.position = CGPoint(x: size.width / 2,
+                                      y: size.height / 2)
         cameraNode.addChild(livesLabel)
         cameraNode.addChild(catsLabel)
         
@@ -181,9 +160,6 @@ class GameScene: SKScene {
                     self?.spawnCat()
                 },
                 SKAction.wait(forDuration: 1.0)])))
-        
-        //debugDrawPlayableArea()
-        playBackgroundMusic(filename: "backgroundMusic.mp3")
     }
     
     func move(sprite: SKSpriteNode, velocity: CGPoint) {
@@ -225,14 +201,13 @@ class GameScene: SKScene {
             targetPosition = node.position
         }
         
-        catsLabel.text = "Cats: \(trainCount)"
-        
         if trainCount >= 15 && !gameOver {
             gameOver = true
             print("YOU WIN!")
             backgroundMusicPlayer.stop()
             endGame(true)
         }
+        catsLabel.text = "Cats: \(trainCount)"
     }
     
     func moveCamera() {
@@ -355,17 +330,18 @@ class GameScene: SKScene {
         var loseCount = 0
         enumerateChildNodes(withName: "train") { (node, stop) in
             var randomPosition = node.position
-            randomPosition.x += CGFloat.random(min: 100, max: 100)
-            randomPosition.y += CGFloat.random(min: 100, max: 100)
+            randomPosition.x += CGFloat.random(min: -100, max: 100)
+            randomPosition.y += CGFloat.random(min: -100, max: 100)
             
             node.name = ""
-            node.run(SKAction.sequence(
-                        [SKAction.group(
-                            [SKAction.rotate(byAngle: π * 4, duration: 1.0),
-                             SKAction.move(to: randomPosition, duration: 1.0),
-                             SKAction.scale(to: 0, duration: 1.0)]),
-                         SKAction.removeFromParent()]))
-            
+            node.run(SKAction.sequence([
+                                        SKAction.group([
+                                            SKAction.rotate(byAngle: π * 4, duration: 1.0),
+                                            SKAction.move(to: randomPosition, duration: 1.0),
+                                            SKAction.scale(to: 0, duration: 1.0)
+                                        ]),
+                                        SKAction.removeFromParent()
+            ]))
             loseCount += 1
             if loseCount >= 2 {
                 stop[0] = true

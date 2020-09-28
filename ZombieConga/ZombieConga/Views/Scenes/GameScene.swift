@@ -16,6 +16,8 @@ class GameScene: SKScene {
     var zombieInvincible: Bool = false
     var lives = 5
     var gameOver = false
+    let livesLabel = SKLabelNode(fontNamed: "Glimstick")
+    let catsLabel = SKLabelNode(fontNamed: "Glimstick")
     
     ///SKActions
     let zombieAnimation: SKAction
@@ -102,6 +104,8 @@ class GameScene: SKScene {
         
         boundsCheckZombie()
         moveTrain()
+        moveCamera()
+        livesLabel.text = "Lives: \(lives)"
         
         if lives <= 0 && !gameOver {
             gameOver = true
@@ -137,6 +141,24 @@ class GameScene: SKScene {
             addChild(background)
         }
         
+        livesLabel.text = "Lives: X"
+        livesLabel.fontColor = SKColor.black
+        livesLabel.fontSize = 100
+        livesLabel.zPosition = 150
+        livesLabel.horizontalAlignmentMode = .left
+        livesLabel.verticalAlignmentMode = .bottom
+        livesLabel.position = CGPoint(x: -playableRect.size.width / 2 + CGFloat(20),
+                                      y: -playableRect.size.height / 2 + CGFloat(20))
+        
+        catsLabel.text = "Cats: X"
+        catsLabel.fontColor = SKColor.black
+        catsLabel.fontSize = 100
+        catsLabel.zPosition = 150
+        catsLabel.horizontalAlignmentMode = .right
+        catsLabel.verticalAlignmentMode = .bottom
+        catsLabel.position = CGPoint(x: -playableRect.size.width / 2 + CGFloat(20),
+                                     y: -playableRect.size.height / 2 + CGFloat(20))
+        
         zombie.position = CGPoint(x: 400, y: 400)
         zombie.zPosition = 100
         
@@ -145,6 +167,8 @@ class GameScene: SKScene {
         
         addChild(zombie)
         addChild(cameraNode)
+        cameraNode.addChild(livesLabel)
+        cameraNode.addChild(catsLabel)
         
         run(SKAction.repeatForever(
                 SKAction.sequence([SKAction.run() { [weak self] in
@@ -200,6 +224,8 @@ class GameScene: SKScene {
             }
             targetPosition = node.position
         }
+        
+        catsLabel.text = "Cats: \(trainCount)"
         
         if trainCount >= 15 && !gameOver {
             gameOver = true

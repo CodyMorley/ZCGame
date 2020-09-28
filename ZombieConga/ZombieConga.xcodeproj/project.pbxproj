@@ -21,6 +21,7 @@
 		5E1F490125033978009A42FF /* MyUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1F490025033978009A42FF /* MyUtils.swift */; };
 		5EAA0FFF252084CF00B57749 /* GameOverScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EAA0FFE252084CF00B57749 /* GameOverScene.swift */; };
 		5EAA100225208BFE00B57749 /* MainMenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EAA100125208BFE00B57749 /* MainMenuScene.swift */; };
+		5EAA106C252180D700B57749 /* GLIMSTIC.TTF in Resources */ = {isa = PBXBuildFile; fileRef = 5EAA106B252180D700B57749 /* GLIMSTIC.TTF */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		5E1F490025033978009A42FF /* MyUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyUtils.swift; sourceTree = "<group>"; };
 		5EAA0FFE252084CF00B57749 /* GameOverScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameOverScene.swift; sourceTree = "<group>"; };
 		5EAA100125208BFE00B57749 /* MainMenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuScene.swift; sourceTree = "<group>"; };
+		5EAA106B252180D700B57749 /* GLIMSTIC.TTF */ = {isa = PBXFileReference; lastKnownFileType = file; path = GLIMSTIC.TTF; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +106,7 @@
 		5E1F48FF24FF4333009A42FF /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				5EAA106B252180D700B57749 /* GLIMSTIC.TTF */,
 				5E097ADF2508341B00303A47 /* Sounds */,
 				5E1F48F324FF42BE009A42FF /* Assets.xcassets */,
 				5E1F48F824FF42BE009A42FF /* Info.plist */,
@@ -205,6 +208,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5EAA106C252180D700B57749 /* GLIMSTIC.TTF in Resources */,
 				5E097AE62508341C00303A47 /* lose.wav in Resources */,
 				5E1F48F224FF42B6009A42FF /* Main.storyboard in Resources */,
 				5E097AE92508341C00303A47 /* backgroundMusic.mp3 in Resources */,

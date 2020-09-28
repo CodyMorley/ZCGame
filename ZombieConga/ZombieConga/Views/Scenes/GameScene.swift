@@ -34,8 +34,8 @@ class GameScene: SKScene {
     ///Camera
     let cameraNode = SKCameraNode()
     var cameraRect: CGRect {
-        let x = cameraNode.position.x - (size.width / 2) + (size.width - playableRect.width) / 2
-        let y = cameraNode.position.y - (size.height / 2) + (size.height - playableRect.height) / 2
+        let x = cameraNode.position.x - size.width / 2 + (size.width - playableRect.width) / 2
+        let y = cameraNode.position.y - size.height / 2 + (size.height - playableRect.height) / 2
         return CGRect(x: x,
                       y: y,
                       width: playableRect.width,
@@ -130,8 +130,8 @@ class GameScene: SKScene {
         for i in 0...1 {
             let background = backgroundNode()
             background.anchorPoint = CGPoint.zero
-            background.position =
-                CGPoint(x: CGFloat(i)*background.size.width, y: 0)
+            background.position = CGPoint(x: CGFloat(i) * background.size.width,
+                                          y: 0)
             background.name = "background"
             background.zPosition = -1
             addChild(background)
@@ -406,15 +406,18 @@ class GameScene: SKScene {
     func spawnEnemy() {
         let enemy = SKSpriteNode(imageNamed: "enemy")
         enemy.name = "enemy"
-        enemy.position = CGPoint(x: size.width + enemy.size.width / 2,
-                                 y: CGFloat.random(min: playableRect.minY + enemy.size.height / 2,
-                                                   max: playableRect.maxY - enemy.size.height / 2))
+        enemy.position = CGPoint(x: cameraRect.maxX + enemy.size.width / 2,
+                                 y: CGFloat.random(min: cameraRect.minY + enemy.size.height / 2,
+                                                   max: cameraRect.maxY - enemy.size.height / 2))
+        enemy.zPosition = 50
         addChild(enemy)
-        let actionMove = SKAction.moveTo(x: -enemy.size.width / 2,
-                                         duration: 2)
+        
+        let actionMove = SKAction.moveBy(x: -(size.width + enemy.size.width),
+                                         y: 0,
+                                         duration: 2.0)
         let actionRemove = SKAction.removeFromParent()
-        enemy.run(SKAction.sequence([actionMove,
-                                     actionRemove]))
+        
+        enemy.run(SKAction.sequence([actionMove, actionRemove]))
     }
     
     
